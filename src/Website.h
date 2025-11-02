@@ -1,13 +1,31 @@
-#pragma once
+// Written by Landen Parke, 11.2.25
 
-#include <iostream>
+#ifndef WEBSITE_H
+#define WEBSITE_H
 
-using namespace std;
+#include <vector>
+#include <string>
 
-struct Website {
-    string url;
-    int rank;
-    bool operator<(const Website& other) {
-        return url < other.url;
-    }
+class Website {
+    private:
+    struct subdomain {
+        std::string sub;
+        int ranking;
+        subdomain(std::string sub, int rank);
+    };
+    std::vector<subdomain> subdomains = {};
+    std::string domain;
+    int rank_max;
+
+    public:
+    Website(std::string domain, std::string sub, int rank);
+    // Accessors
+    int getRank();
+    std::string getDomain();
+    std::vector<std::pair<std::string, int>> getSubdomains();
+    // Mutators
+    void setRank(int rank);
+    void addSubdomain(std::string sub, int rank);
 };
+
+# endif
