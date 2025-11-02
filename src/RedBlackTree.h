@@ -19,7 +19,11 @@ class RedBlackTree : public AutoComplete {
     TreeNode* root = nullptr;
 
     virtual vector<string> getAutoCompleteEntries(const string& s) {
-        return {};
+        vector<string> res;
+        if (root) {
+            extractAutocomplete(root, s, res);
+        }
+        return res;
     }
     
     virtual void addWebsite(Website website) {
@@ -52,6 +56,20 @@ class RedBlackTree : public AutoComplete {
     }
 
     private:
+
+    void extractAutocomplete(TreeNode* node, const string& s, vector<string>& res) {
+        string comp = node->website.url.substr(0, s.size());
+        if (node->left) {
+            extractAutocomplete(node->left, s, res);
+        }
+        if (s == comp) {
+            res.push_back(node->website.url);
+        }
+        if (node->right) {
+            extractAutocomplete(node->right, s, res);
+        }
+        
+    }
 
     void clearRecursive(TreeNode* node) {
         if (node->left) {

@@ -1,8 +1,9 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch_test_macros.hpp>
 #include "RedBlackTree.h"
+#include <algorithm>
 
-int add(int a, int b) { return a + b; }
+using namespace std;
 
 TEST_CASE("Basic Insertion", "[Insertion]") {
     RedBlackTree tree;
@@ -104,4 +105,20 @@ TEST_CASE("Basic Insertion", "[Insertion]") {
     tree.addInplace("bb", 0); // lexicographically between b and c
     REQUIRE(tree.getPostorder() == "a, bb, b, d, c, f, h, g, e");
     tree.clear();
+}
+
+TEST_CASE("Autocomplete", "[Autocomplete]") {
+    RedBlackTree tree;
+
+    tree.addInplace("cat", 0);
+    tree.addInplace("category", 0);
+    tree.addInplace("capillary", 0);
+    tree.addInplace("catalog", 0);
+    tree.addInplace("bike", 0);
+    tree.addInplace("catalyst", 0);
+
+    vector<string> res = tree.getAutoCompleteEntries("cat");
+    sort(res.begin(), res.end());
+    vector<string> comp = {"cat", "catalog", "catalyst", "category"};
+    REQUIRE(res == comp);
 }
