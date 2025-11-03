@@ -26,6 +26,7 @@ class Website {
     // Mutators
     void setRank(int rank);
     void addSubdomain(std::string sub, int rank);
+    bool operator<(Website other);
 };
 
 # endif

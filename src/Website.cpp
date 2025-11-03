@@ -43,3 +43,6 @@ void Website::addSubdomain(std::string sub, int rank) {
     this->subdomains.push_back(subdomain(sub, rank));
 }
 
+bool Website::operator<(Website other) {
+    return getDomain() < other.getDomain();
+}
