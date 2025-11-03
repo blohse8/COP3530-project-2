@@ -2,8 +2,10 @@
 
 #include "Website.h"
 #include "AutoComplete.h"
+#include "Constants.h"
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 using namespace std;
 
@@ -19,9 +21,25 @@ class RedBlackTree : public AutoComplete {
     TreeNode* root = nullptr;
 
     virtual vector<string> getAutoCompleteEntries(const string& s) {
-        vector<string> res;
+        // get a vector of strings that represents the autocomplete entries that should be displayed
+        vector<Website> websites;
         if (root) {
-            extractAutocomplete(root, s, res);
+            extractAutocomplete(root, s, websites);
+        }
+
+        // sort list in order of visitations
+        sort(websites.begin(), websites.end(),
+        [](const Website& a, const Website& b) {
+            if (a.rank != b.rank)
+                return a.rank < b.rank;
+            return a.url < b.url;
+        });
+        
+        // cap list at a certain number so as not to overwhelm the user with a massive list
+        int loopCount = min(MAX_AUTOCOMPLETE_ENTRIES, (int)websites.size());
+        vector<string> res;
+        for (int i = 0; i < loopCount; i++) {
+            res.push_back(websites[i].url);
         }
         return res;
     }
@@ -57,18 +75,18 @@ class RedBlackTree : public AutoComplete {
 
     private:
 
-    void extractAutocomplete(TreeNode* node, const string& s, vector<string>& res) {
+    void extractAutocomplete(TreeNode* node, const string& s, vector<Website>& res) {
+        // essentially runs an inorder traversal of the list but only includes items equal to the current search string
         string comp = node->website.url.substr(0, s.size());
-        if (node->left) {
+        if (node->left && s <= comp) {
             extractAutocomplete(node->left, s, res);
         }
         if (s == comp) {
-            res.push_back(node->website.url);
+            res.push_back(node->website);
         }
         if (node->right) {
             extractAutocomplete(node->right, s, res);
         }
-        
     }
 
     void clearRecursive(TreeNode* node) {

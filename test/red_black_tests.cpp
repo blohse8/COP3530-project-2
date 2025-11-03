@@ -118,7 +118,6 @@ TEST_CASE("Autocomplete", "[Autocomplete]") {
     tree.addInplace("catalyst", 0);
 
     vector<string> res = tree.getAutoCompleteEntries("cat");
-    sort(res.begin(), res.end());
     vector<string> comp = {"cat", "catalog", "catalyst", "category"};
     REQUIRE(res == comp);
 }
