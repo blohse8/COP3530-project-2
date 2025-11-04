@@ -10,10 +10,12 @@
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <unordered_set>
 
 
 std::unordered_map<std::string, Website> parse_data() { // Code reference: https://cppbyexample.com/parse_csv.html
     std::string file_location = "./data/202509.csv";
+    std::unordered_set<std::string> TLDs = {"com", "org", "net", "gov", "edu", "co", "uk", "io", "info"};
     std::ifstream input{file_location};
     std::unordered_map<std::string, Website> output;
 
@@ -25,8 +27,6 @@ std::unordered_map<std::string, Website> parse_data() { // Code reference: https
         std::cerr << "File not found: " << file_location << " does not exist\n";
         return {};
     }
-
-    std::vector<std::string> keywords;
 
     for (line; std::getline(input, line);) {
         bool NSFW = false;
@@ -50,9 +50,10 @@ std::unordered_map<std::string, Website> parse_data() { // Code reference: https
             if (subdomain_index != std::string::npos) {
                 domain = link.substr(subdomain_index + 1);
                 subdomain = link.substr(0, subdomain_index);
-            } else {
-                domain = link;
-                subdomain = "No subdomain";
+                if (TLDs.count(domain) == 1) {
+                    domain = subdomain + "." + domain;
+                    subdomain = "No subdomain";
+                }
             }
 
             auto it = output.find(domain);

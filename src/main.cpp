@@ -9,61 +9,183 @@
 #include "Website.h"
 #include "parse_data.h"
 #include "terminal.h"
-
-using namespace std;
+#include "Constants.h"
+#include "RedBlackTree.h"
+#include "Trie_tree.cpp"
+#include <cmath>
 
 // TODO: Implement autocomplete
 
+void websiteSearch(std::string input, std::unordered_map<std::string, Website>& sites) {
+    auto it = sites.find(input);
+    if (it != sites.end()) {
+        auto website = it->second;
+        printFrameDash();
+        std::cout << "Domain:   " << website.getDomain() << std::endl;
+        std::cout << "Rank:     This domain is in the top " << website.getRank() << " websites." << std::endl;
+        printFrameDash();
+        std::cout << "Subdomains: " << std::endl;
+        std::vector<std::pair<std::string, int>> subdomains = website.getSubdomains();
+        for (int i = 0; i < subdomains.size(); ++i) {
+            std::cout << std::left << std::setw(18) << subdomains[i].first;
+            std::cout << std::right << std::setw(9) << subdomains[i].second;
+            std::cout << std::endl;
+            if (i == 9 && subdomains.size() != 10) {
+                std::cout << std::left << std::setw(18) << "...";
+                std::cout << std::right << std::setw(9) << "..." << std::endl;
+                std::cout << "There are " << subdomains.size() - 10 << " more subdomains." << std::endl;
+                break;
+            }
+        }
+        printFrameDash();
+        std::cout << std::endl;
+        printFrame();
+        
+    } else {
+        std::cout << "No matching domain...\n";
+    }
+}
+
 int main() {
+    // Parse Data
     auto start = std::chrono::high_resolution_clock::now();
     std::unordered_map<std::string, Website> sites = parse_data();
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    auto durationSec = std::chrono::duration_cast<std::chrono::seconds>(stop - start);
-    std::cout << "Time to parse data: " << duration.count() << "ms (" << durationSec.count() << " second[s])" << std::endl;
+    std::cout << "\nTime to parse data: " << duration.count() << "ms (" << std::setprecision(2)<< static_cast<float>(duration.count())/1000 << " second[s])\n" << std::endl;
+
+    // Add data to Red-Black Tree
+    auto startRBT = std::chrono::high_resolution_clock::now();
+    RedBlackTree RBT_Autocomp;
+    for (auto i = sites.begin(); i != sites.end(); ++i) {
+        RBT_Autocomp.addWebsite(i->second);
+    }
+    auto stopRBT = std::chrono::high_resolution_clock::now();
+    auto durationRBT = std::chrono::duration_cast<std::chrono::milliseconds>(stopRBT - startRBT);
+    std::cout << "Time to add data to Red-Black Tree: " << durationRBT.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationRBT.count())/1000 << " second[s])\n" << std::endl;
+
+    // Add data to Trie
+    auto startTrie = std::chrono::high_resolution_clock::now();
+    Trie Trie_Autocomp;
+    for (auto i = sites.begin(); i != sites.end(); ++i) {
+        Trie_Autocomp.insert_website(i->second.getDomain());
+    }
+    auto stopTrie = std::chrono::high_resolution_clock::now();
+    auto durationTrie = std::chrono::duration_cast<std::chrono::milliseconds>(stopTrie - startTrie);
+    std::cout << "Time to add data to Trie: " << durationTrie.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationTrie.count())/1000 << " second[s])\n" << std::endl;
+
+    std::string fastest;
+    if (durationTrie.count() > durationRBT.count()) {
+        fastest = "Red-Black Tree";
+    } else {
+        fastest = "Trie";
+    }
+    std::cout << "The " << fastest << " is faster by " << (std::abs(durationRBT.count() - durationTrie.count())) << "ms (" << std::setprecision(2)<< static_cast<float>(std::abs(durationRBT.count() - durationTrie.count()))/1000 << " second[s])\n\n";
+
 
     bool exitCode = false;
+    printLogo();
+    std::cout << "\nWelcome to WebTop!\nThis program is designed to compare the autocomplete functionality of Red-Black Trees and Tries.\n\n";
 
+    printFrame();
+
+    
     while (!exitCode) {
-        printFrame();
-        printFrame();
-        printLogo();
-        printFrame();
-
-        std::cout << std::endl << "Please enter a website domain (enter 'x' to exit): ";
-        std::string input;
-        std::cin >> input;
-        if (input == "x") {
+        // Red-Black Tree Autocomplete
+        std::cout << "\nRed-Black Tree Autocomplete\n";
+        bool validInputRBT = false;
+        std::string inputRBT;
+        while (!validInputRBT) {
+            std::cout << "\nPlease enter at least two letters of your website domain (enter 'x' to exit): ";
+            std::cin >> inputRBT;
+            std::cout << "\n";
+            if (inputRBT.length() >= 2 || inputRBT == "x") {
+                validInputRBT = true;
+            }
+        }
+        if (inputRBT == "x") {
             exitCode = true;
             break;
         }
-        std::cout << std::endl << std::endl;
-        auto it = sites.find(input);
-        if (it != sites.end()) {
-            auto website = it->second;
-            std::cout << "Domain:   " << website.getDomain() << std::endl;
-            std::cout << "Rank:     This domain is in the top " << website.getRank() << " websites." << std::endl;
-            printFrameDash();
-            std::cout << "Subdomains: " << std::endl;
-            std::vector<std::pair<std::string, int>> subdomains = website.getSubdomains();
-            for (int i = 0; i < subdomains.size(); ++i) {
-                std::cout << std::left << std::setw(18) << subdomains[i].first;
-                std::cout << std::right << std::setw(9) << subdomains[i].second;
-                std::cout << std::endl;
-                if (i == 9 && subdomains.size() != 10) {
-                    std::cout << std::left << std::setw(18) << "...";
-                    std::cout << std::right << std::setw(9) << "..." << std::endl;
-                    std::cout << "There are " << subdomains.size() - 10 << " more subdomains." << std::endl;
-                    break;
+        std::vector<std::string> resultRBT = RBT_Autocomp.getAutoCompleteEntries(inputRBT);
+        if (resultRBT.size() > 0) {
+            std::cout << "Results:\n";
+            validInputRBT = false;
+            std::string websiteInputRBT;
+            int inputChoiceRBT;
+            while (!validInputRBT) {
+                for (int i = 0; i < resultRBT.size(); ++i) {
+                    std::cout << std::to_string(i + 1) << ".) " << resultRBT[i] << "\n";
+                }   
+                std::cout << "\nPlease choose a website: ";
+                std::cin >> inputChoiceRBT;
+                std::cout << "\n";
+                if (inputChoiceRBT >= 1 && inputChoiceRBT <= resultRBT.size()) {
+                    validInputRBT = true;
+                    websiteInputRBT = resultRBT[inputChoiceRBT - 1];
                 }
             }
-            std::cout << std::endl;
-            printFrame();
-            std::cout << "\n\n";
-            
+            websiteSearch(websiteInputRBT, sites);
+
         } else {
-            std::cout << "No matching domain...\n";
+            std::cout << "\nNo results...\n";
+            printFrame();
         }
+
+        // Trie Autocomplete
+        std::cout << "\nTrie Autocomplete\n";
+        bool validInputTrie = false;
+        std::string inputTrie;
+        while (!validInputTrie) {
+            std::cout << "\nPlease enter at least two letters of your website domain (enter 'x' to exit): ";
+            std::cin >> inputTrie;
+            std::cout << "\n";
+            if (inputTrie.length() >= 2 || inputTrie == "x") {
+                validInputTrie = true;
+            }
+        }
+        if (inputTrie == "x") {
+            exitCode = true;
+            break;
+        }
+        std::vector<std::string> resultTrie = Trie_Autocomp.autocomplete_suggest(inputTrie);
+        std::sort(resultTrie.begin(), resultTrie.end(), [&sites](std::string website1, std::string website2) { // sort the returned vector by the ranking of domain
+            return sites.at(website1).getRank() > sites.at(website2).getRank();
+        });
+        if (resultTrie.size() > 0) {
+            std::cout << "Results:\n";
+            validInputTrie = false;
+            std::string websiteInputTrie;
+            int inputChoiceTrie;
+            while (!validInputTrie) {
+                for (int i = 0; i < resultTrie.size(); ++i) {
+                    std::cout << std::to_string(i + 1) << ".) " << resultTrie[i] << "\n";
+                }   
+                std::cout << "\nPlease choose a website: ";
+                std::cin >> inputChoiceTrie;
+                std::cout << "\n";
+                if (inputChoiceTrie >= 1 && inputChoiceTrie <= resultTrie.size()) {
+                    validInputTrie = true;
+                    websiteInputTrie = resultTrie[inputChoiceTrie - 1];
+                }
+            }
+            websiteSearch(websiteInputTrie, sites);
+
+        } else {
+            std::cout << "\nNo results...\n";
+        }
+
+        
+
+
+
+
+
+
+
+
+
+        
         
 
 

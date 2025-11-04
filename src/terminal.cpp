@@ -2,6 +2,7 @@
 
 #include "terminal.h"
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -19,15 +20,17 @@ void printLogo() {
         "[38;5;108m                                                 .JMML.     [39m"
                     
     };
+    printFrame();
     for (auto line: logo) {
-        std::cout << line << std::endl;
+        std::cout << "∥" << std::right << std::setw(95) << line << std::right << std::setw(26) << "∥" << std::endl;
     }
+    printFrame();
 }
 
 void printFrame() {
-    std::cout << "======================================================================================================================" << std::endl;
+    std::cout << "========================================================================================================" << std::endl;
 }
 
 void printFrameDash() {
-    std::cout << "----------------------------------------------------------------------------------------------------------------------" << std::endl;
+    std::cout << "--------------------------------------------------------------------------------------------------------" << std::endl;
 }
