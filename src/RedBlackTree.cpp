@@ -55,8 +55,10 @@ string RedBlackTree::getPostorder() {
 }
 
 void RedBlackTree::clear() {
-    clearRecursive(root);
-    root = nullptr;
+    if (root) {
+        clearRecursive(root);
+        root = nullptr;
+    }
 }
 
 void RedBlackTree::extractAutocomplete(TreeNode* node, const string& s, vector<Website>& res) {

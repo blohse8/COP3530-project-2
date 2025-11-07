@@ -19,6 +19,7 @@ struct TreeNode {
 class RedBlackTree : public AutoComplete {
     public:
     TreeNode* root = nullptr;
+    ~RedBlackTree() {   clear();    }
     virtual vector<string> getAutoCompleteEntries(const string& s);
     virtual void addWebsite(Website website);
     void addInplace(string url, string subdomains, int rank);
