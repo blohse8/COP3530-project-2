@@ -20,12 +20,17 @@ void websiteSearch(std::string input, std::unordered_map<std::string, Website>& 
     auto it = sites.find(input);
     if (it != sites.end()) {
         auto website = it->second;
+        std::vector<std::pair<std::string, int>> subdomains = website.getSubdomains();
         printFrameDash();
+        std::cout << "http://";
+        if (subdomains[0].first != "No subdomain") {
+            std::cout << subdomains[0].first << '.';
+        }
+        std::cout << website.getDomain() << "\n";
         std::cout << "Domain:   " << website.getDomain() << std::endl;
         std::cout << "Rank:     This domain is in the top " << website.getRank() << " websites." << std::endl;
         printFrameDash();
         std::cout << "Subdomains: " << std::endl;
-        std::vector<std::pair<std::string, int>> subdomains = website.getSubdomains();
         for (int i = 0; i < subdomains.size(); ++i) {
             std::cout << std::left << std::setw(18) << subdomains[i].first;
             std::cout << std::right << std::setw(9) << subdomains[i].second;
@@ -96,10 +101,10 @@ int main() {
         bool validInputRBT = false;
         std::string inputRBT;
         while (!validInputRBT) {
-            std::cout << "\nPlease enter at least two letters of your website domain (enter 'x' to exit): ";
+            std::cout << "\nPlease enter at least two letters of your website domain: ";
             std::cin >> inputRBT;
             std::cout << "\n";
-            if (inputRBT.length() >= 2 || inputRBT == "x") {
+            if (inputRBT.length() >= 2) {
                 validInputRBT = true;
             }
         }
@@ -107,7 +112,11 @@ int main() {
             exitCode = true;
             break;
         }
+        auto startAutoRBT = std::chrono::high_resolution_clock::now();
         std::vector<std::string> resultRBT = RBT_Autocomp.getAutoCompleteEntries(inputRBT);
+        auto stopAutoRBT = std::chrono::high_resolution_clock::now();
+        auto durationAutoRBT = std::chrono::duration_cast<std::chrono::milliseconds>(stopAutoRBT - startAutoRBT);
+        std::cout << "\nTime to autocomplete with Red-Black Tree: " << durationAutoRBT.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationAutoRBT.count())/1000 << " second[s])\n" << std::endl;
         if (resultRBT.size() > 0) {
             std::cout << "Results:\n";
             validInputRBT = false;
@@ -129,6 +138,8 @@ int main() {
 
         } else {
             std::cout << "\nNo results...\n";
+            printFrameDash();
+            std::cout << std::endl;
             printFrame();
         }
 
@@ -137,10 +148,10 @@ int main() {
         bool validInputTrie = false;
         std::string inputTrie;
         while (!validInputTrie) {
-            std::cout << "\nPlease enter at least two letters of your website domain (enter 'x' to exit): ";
+            std::cout << "\nPlease enter at least two letters of your website domain: ";
             std::cin >> inputTrie;
             std::cout << "\n";
-            if (inputTrie.length() >= 2 || inputTrie == "x") {
+            if (inputTrie.length() >= 2) {
                 validInputTrie = true;
             }
         }
@@ -148,9 +159,13 @@ int main() {
             exitCode = true;
             break;
         }
+        auto startAutoTrie = std::chrono::high_resolution_clock::now();
         std::vector<std::string> resultTrie = Trie_Autocomp.autocomplete_suggest(inputTrie);
+        auto stopAutoTrie = std::chrono::high_resolution_clock::now();
+        auto durationAutoTrie = std::chrono::duration_cast<std::chrono::milliseconds>(stopAutoTrie- startAutoTrie);
+        std::cout << "\nTime to autocomplete with Trie: " << durationAutoTrie.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationAutoTrie.count())/1000 << " second[s])\n" << std::endl;
         std::sort(resultTrie.begin(), resultTrie.end(), [&sites](std::string website1, std::string website2) { // sort the returned vector by the ranking of domain
-            return sites.at(website1).getRank() > sites.at(website2).getRank();
+            return sites.at(website1).getRank() < sites.at(website2).getRank();
         });
         if (resultTrie.size() > 0) {
             std::cout << "Results:\n";
@@ -160,6 +175,9 @@ int main() {
             while (!validInputTrie) {
                 for (int i = 0; i < resultTrie.size(); ++i) {
                     std::cout << std::to_string(i + 1) << ".) " << resultTrie[i] << "\n";
+                    if (i == 9) {
+                        break;
+                    }
                 }   
                 std::cout << "\nPlease choose a website: ";
                 std::cin >> inputChoiceTrie;
@@ -173,7 +191,21 @@ int main() {
 
         } else {
             std::cout << "\nNo results...\n";
+            printFrameDash();
+            std::cout << std::endl;
+            printFrame();
         }
+
+        std::cout << "\nSearch for websites again? (y/N): ";
+        std::string loop_in;
+        std::cin >> loop_in;
+        if (loop_in == "y" || loop_in == "Y") {
+            exitCode = false;
+        } else {
+            exitCode = true;
+        }
+        std::cout << "\n";
+        printFrame();
 
         
 
