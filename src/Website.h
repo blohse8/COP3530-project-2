@@ -13,7 +13,7 @@ class Website {
         int ranking;
         subdomain(std::string sub, int rank);
     };
-    std::vector<subdomain> subdomains = {};
+    std::vector<subdomain> subdomains = {}; // all subdomains
     std::string domain;
     int rank_max;
 
