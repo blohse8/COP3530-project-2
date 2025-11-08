@@ -97,8 +97,11 @@ int main() {
 
     printFrame();
 
-    
+    int redBlackAutocompleteTotal = 0;
+    int trieAutocompleteTotal = 0;
+    int iterations = 0;
     while (!exitCode) {
+        iterations++;
         // Red-Black Tree Autocomplete
         std::cout << "\nRed-Black Tree Autocomplete\n";
         bool validInputRBT = false;
@@ -115,6 +118,7 @@ int main() {
         std::vector<std::string> resultRBT = RBT_Autocomp.getAutoCompleteEntries(inputRBT); // return results of autocomplete (max 10)
         auto stopAutoRBT = std::chrono::high_resolution_clock::now();
         auto durationAutoRBT = std::chrono::duration_cast<std::chrono::milliseconds>(stopAutoRBT - startAutoRBT);
+        redBlackAutocompleteTotal += static_cast<int>(durationAutoRBT.count());
         std::cout << "\nTime to autocomplete with Red-Black Tree: " << durationAutoRBT.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationAutoRBT.count())/1000 << " second[s])\n" << std::endl;
         if (resultRBT.size() > 0) {
             std::cout << "Results:\n";
@@ -162,6 +166,7 @@ int main() {
         std::vector<std::string> resultTrie = Trie_Autocomp.autocomplete_suggest(inputTrie);
         auto stopAutoTrie = std::chrono::high_resolution_clock::now();
         auto durationAutoTrie = std::chrono::duration_cast<std::chrono::milliseconds>(stopAutoTrie- startAutoTrie);
+        trieAutocompleteTotal += static_cast<int>(durationAutoTrie.count());;
         std::cout << "\nTime to autocomplete with Trie: " << durationAutoTrie.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationAutoTrie.count())/1000 << " second[s])\n" << std::endl;
         std::sort(resultTrie.begin(), resultTrie.end(), [&sites](std::string website1, std::string website2) { // sort the returned vector by the ranking of domain
             int rank1 = sites.at(website1).getRank();
@@ -211,6 +216,8 @@ int main() {
             exitCode = false;
         }
         std::cout << "\n";
+        std::cout << "Average time for red black tree autocomplete: " << (redBlackAutocompleteTotal / iterations) << "ms\n";
+        std::cout << "Average time for trie autocomplete: " << (trieAutocompleteTotal / iterations) << "ms\n";
         printFrame();
     }
     return 0;
