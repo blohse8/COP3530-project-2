@@ -196,32 +196,16 @@ int main() {
         }
 
         std::cout << "\nSearch for websites again? (y/N): ";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         std::string loop_in;
-        std::cin >> loop_in;
-        if (loop_in == "y" || loop_in == "Y") {
-            exitCode = false;
-        } else {
+        std::getline(std::cin, loop_in);
+        if (loop_in.empty() || (loop_in != "y" && loop_in != "Y")) {
             exitCode = true;
+        } else {
+            exitCode = false;
         }
         std::cout << "\n";
         printFrame();
-
-        
-
-
-
-
-
-
-
-
-
-        
-        
-
-
-
     }
-
     return 0;
 }
