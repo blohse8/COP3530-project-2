@@ -31,7 +31,7 @@ vector<string> RedBlackTree::getAutoCompleteEntries(const string& s) {
 }
 
 void RedBlackTree::addWebsite(Website website) {
-    TreeNode* insertNode = new TreeNode{website};
+    TreeNode* insertNode = new TreeNode(website);
     root = insert(insertNode, root);
     if (root->red) {
         root->red = false;

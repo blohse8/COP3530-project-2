@@ -14,6 +14,9 @@ struct TreeNode {
     TreeNode* left = nullptr;
     TreeNode* right = nullptr;
     bool red = true;
+
+    TreeNode(Website& website)
+    :website(website){}
 };
 
 class RedBlackTree : public AutoComplete {
