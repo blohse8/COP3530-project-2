@@ -164,7 +164,13 @@ int main() {
         auto durationAutoTrie = std::chrono::duration_cast<std::chrono::milliseconds>(stopAutoTrie- startAutoTrie);
         std::cout << "\nTime to autocomplete with Trie: " << durationAutoTrie.count() << "ms (" << std::setprecision(2)<< static_cast<float>(durationAutoTrie.count())/1000 << " second[s])\n" << std::endl;
         std::sort(resultTrie.begin(), resultTrie.end(), [&sites](std::string website1, std::string website2) { // sort the returned vector by the ranking of domain
-            return sites.at(website1).getRank() < sites.at(website2).getRank();
+            int rank1 = sites.at(website1).getRank();
+            int rank2 = sites.at(website2).getRank();
+            if (rank1 != rank2) {
+                return rank1 < rank2;
+            }else {
+                return website1 < website2;
+            }
         });
         if (resultTrie.size() > 0) {
             std::cout << "Results:\n";
